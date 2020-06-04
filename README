@@ -1,0 +1,28 @@
+# vim-bazel
+
+This plugin allows invoking bazel from vim
+
+# Commands
+
+:Bazel {command} [targets...]
+
+This is identical to calling :!bazel {command} [arguments...] except
+when the command is "build" or "test", in which case, it provides some
+niceties
+
+* Errors from the compiler are loaded into the quickfix list
+* Test failure logs are loaded into the quickfix list
+* Parses errors due to missing dependencies in bazel target definitions
+* If no targets are specified, it calls bazel for the current file
+* If the current file is a BUILD file, calls the command for all the
+  targets in the BUILD file
+
+Note: It is currently tuned for C++ development in the sense that the
+errorformat is set to recognize error messages from gcc/clang
+
+# Missing Features
+
+* Async build
+* Bazel command completion
+* Passing commandline flags to bazel
+* Support for languages besides C++
