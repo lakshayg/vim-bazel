@@ -71,9 +71,15 @@ function! bazel#Execute(action, ...)
 endfunction
 
 " Completions for the :Bazel command {{{
-if filereadable("/usr/local/lib/bazel/bin/bazel-complete.bash")
-  let g:bazel_bash_completion_path = "/usr/local/lib/bazel/bin/bazel-complete.bash"
-endif
+let s:bazel_bash_complete_path_candidates = [
+      \ "/etc/bash_completion.d/bazel",
+      \ "/usr/local/lib/bazel/bin/bazel-complete.bash"
+      \ ]
+for f in s:bazel_bash_complete_path_candidates
+  if filereadable(f)
+    let g:bazel_bash_completion_path = f
+  endif
+endfor
 
 
 " Completions are extracted from the bash bazel completion function.
@@ -119,7 +125,7 @@ function! bazel#CompletionsFromBash(arglead, line, pos) abort
       \ l:comp_arguments_string,
       \ l:complete_wrapper_command))
 
-  let l:bash_command = 'bash -norc -i -c ' . l:shell_script
+  let l:bash_command = 'bash -norc -i -c ' . l:shell_script . ' 2>/dev/null'
   let l:result = system(l:bash_command)
 
   let l:bash_suggestions = split(l:result)
