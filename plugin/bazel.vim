@@ -70,8 +70,90 @@ function! bazel#Execute(action, ...)
   exe "make" join(l:cmd + l:targets)
 endfunction
 
+" Completions for the :Bazel command {{{
+if filereadable("/usr/local/lib/bazel/bin/bazel-complete.bash")
+  let g:bazel_bash_completion_path = "/usr/local/lib/bazel/bin/bazel-complete.bash"
+endif
 
-command! -nargs=+ Bazel :call bazel#Execute(<f-args>)
+
+" Completions are extracted from the bash bazel completion function.
+" Taken from https://github.com/bazelbuild/vim-bazel/blob/master/autoload/bazel.vim
+" with minor modifications
+function! bazel#CompletionsFromBash(arglead, line, pos) abort
+  " The bash complete script does not truly support autocompleting within a
+  " word, return nothing here rather than returning bad suggestions.
+  if a:pos + 1 < strlen(a:line)
+    return []
+  endif
+
+  let l:cmd = substitute(a:line[0:a:pos], '\v\w+', 'bazel', '')
+
+  let l:comp_words = split(l:cmd, '\v\s+')
+  if l:cmd =~# '\v\s$'
+    call add(l:comp_words, '')
+  endif
+  let l:comp_line = join(l:comp_words)
+
+  " Note: Bashisms below are intentional. We invoke this via bash explicitly,
+  " and it should work correctly even if &shell is actually not bash-compatible.
+
+  " Extracts the bash completion command, should be something like:
+  " _bazel__complete
+  let l:complete_wrapper_command = ' $(complete -p ' . l:comp_words[0] .
+      \ ' | sed "s/.*-F \\([^ ]*\\) .*/\\1/")'
+
+  " Build a list of all the arguments that have to be passed in to autocomplete.
+  let l:comp_arguments = {
+      \ 'COMP_LINE' : '"' .l:comp_line . '"',
+      \ 'COMP_WORDS' : '(' . l:comp_line . ')',
+      \ 'COMP_CWORD' : string(len(l:comp_words) - 1),
+      \ 'COMP_POINT' : string(strlen(l:comp_line)),
+      \ }
+  let l:comp_arguments_string =
+      \ join(map(items(l:comp_arguments), 'v:val[0] . "=" . v:val[1]'))
+
+  " Build the command to run with bash
+  let l:shell_script = shellescape(printf(
+      \ 'source %s; export %s; %s && echo ${COMPREPLY[*]}',
+      \ g:bazel_bash_completion_path,
+      \ l:comp_arguments_string,
+      \ l:complete_wrapper_command))
+
+  let l:bash_command = 'bash -norc -i -c ' . l:shell_script
+  let l:result = system(l:bash_command)
+
+  let l:bash_suggestions = split(l:result)
+  " The bash complete not include anything before the colon, add it.
+  let l:word_prefix = substitute(l:comp_words[-1], '\v[^:]+$', '', '')
+  return map(l:bash_suggestions, 'l:word_prefix . v:val')
+endfunction
+
+
+let s:bazel_commands=[]
+function! bazel#Completions(arglead, cmdline, cursorpos)
+  " Initialize s:bazel_commands if it hasn't been initialized
+  if empty(s:bazel_commands)
+    let s:bazel_commands = split(system("bazel help completion | awk -F'\"' '/BAZEL_COMMAND_LIST=/ { print $2 }'"))
+  endif
+
+  " Complete commands
+  let l:cmdlist = split(a:cmdline)
+  if len(l:cmdlist) == 1 || (len(l:cmdlist) == 2 && index(s:bazel_commands, l:cmdlist[-1]) < 0)
+    return filter(deepcopy(s:bazel_commands), printf('v:val =~ "^%s"', a:arglead))
+  endif
+
+  " Complete targets by using the bash completion logic
+  " We wrap this function because if completions from bash are used directly,
+  " they also include commandline flags which we don't support at the moment
+  if exists("g:bazel_bash_completion_path")
+    return bazel#CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
+  else
+    return []
+  endif
+endfunction
+" }}}
+
+command! -complete=customlist,bazel#Completions -nargs=+ Bazel :call bazel#Execute(<f-args>)
 
 " Test cases
 " ==============================================================================
@@ -80,3 +162,5 @@ command! -nargs=+ Bazel :call bazel#Execute(<f-args>)
 " * Build/test another file by passing args to Bazel build/test
 " * Build/test from a BUILD file
 " * Bazel run a binary
+
+" vim:foldmethod=marker

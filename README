@@ -20,9 +20,18 @@ niceties
 Note: It is currently tuned for C++ development in the sense that the
 errorformat is set to recognize error messages from gcc/clang
 
+# Command completion
+
+To enable completion of targets in bazel commands, vim-bazel tries to
+determine the location of the bazel bash completion script. If target
+completion does not work, set g:bazel_bash_completion_path to the path
+of the bazel bash completion script on your system. To locate the script
+on your system see: https://docs.bazel.build/versions/master/completion.html
+
+let g:bazel_bash_completion_path = "/usr/local/etc/bash_completion.d/bazel-complete.bash"
+
 # Missing Features
 
 * Async build
-* Bazel command completion
 * Passing commandline flags to bazel
 * Support for languages besides C++
