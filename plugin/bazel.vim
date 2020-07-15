@@ -65,6 +65,8 @@ function! bazel#Execute(action, ...)
   if a:action == "build" || a:action == "test"
     let l:cmd = bazel#BuildOrTestCommand(l:cmd)
     let l:targets = bazel#BuildOrTestTargets(l:targets)
+  elseif a:action == "run" && len(l:targets) == 0
+    let l:targets = [ bazel#Target(expand("%"))[0] ]
   endif
 
   exe "make" join(l:cmd + l:targets)
