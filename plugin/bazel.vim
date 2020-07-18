@@ -1,4 +1,4 @@
-function! bazel#PathRelativeToWsRoot(path)
+function! s:PathRelativeToWsRoot(path)
   let full_path = fnamemodify(a:path, ":p")
   " cd into the WORKSPACE root
   exe "cd" fnamemodify(findfile("WORKSPACE", ".;"), ":p:h")
@@ -9,9 +9,9 @@ function! bazel#PathRelativeToWsRoot(path)
 endfunction
 
 
-function! bazel#Target(fname)
+function! s:Target(fname)
   let build_file_path = findfile("BUILD", ".;")
-  let relative_path = bazel#PathRelativeToWsRoot(build_file_path)
+  let relative_path = s:PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
 
@@ -26,12 +26,12 @@ function! bazel#Target(fname)
 endfunction
 
 
-function! bazel#BuildOrTestCommand(cmd)
+function! s:BuildOrTestCommand(cmd)
   return a:cmd + ['--noshow_timestamps']
 endfunction
 
 
-function! bazel#BuildOrTestTargets(targets)
+function! s:BuildOrTestTargets(targets)
   if !empty(a:targets)
     return a:targets
   endif
@@ -40,13 +40,13 @@ function! bazel#BuildOrTestTargets(targets)
 
   " Is the current file a BUILD file?
   if fnamemodify(fname, ":t") == "BUILD"
-    let rel_path = bazel#PathRelativeToWsRoot(fname)
+    let rel_path = s:PathRelativeToWsRoot(fname)
     let package_path = fnamemodify(rel_path, ":h")
     return ["//" . package_path . ":all"]
   endif
 
   " Assume that the current file is a source file
-  let targets = bazel#Target(fname)
+  let targets = s:Target(fname)
   echo "Target: " . join(targets)
   return targets
 endfunction
@@ -63,10 +63,10 @@ function! bazel#Execute(action, ...)
   " to support reading errors into the quickfix list and triggering
   " build/test for current file if targets are left unspecified
   if a:action == "build" || a:action == "test"
-    let cmd = bazel#BuildOrTestCommand(cmd)
-    let targets = bazel#BuildOrTestTargets(targets)
+    let cmd = s:BuildOrTestCommand(cmd)
+    let targets = s:BuildOrTestTargets(targets)
   elseif a:action == "run" && len(targets) == 0
-    let targets = [ bazel#Target(expand("%"))[0] ]
+    let targets = [ s:Target(expand("%"))[0] ]
   endif
 
   exe "make" join(cmd + targets)
@@ -87,7 +87,7 @@ endfor
 " Completions are extracted from the bash bazel completion function.
 " Taken from https://github.com/bazelbuild/vim-bazel/blob/master/autoload/bazel.vim
 " with minor modifications
-function! bazel#CompletionsFromBash(arglead, line, pos) abort
+function! s:CompletionsFromBash(arglead, line, pos) abort
   " The bash complete script does not truly support autocompleting within a
   " word, return nothing here rather than returning bad suggestions.
   if a:pos + 1 < strlen(a:line)
@@ -138,7 +138,7 @@ endfunction
 
 
 let s:bazel_commands=[]
-function! bazel#Completions(arglead, cmdline, cursorpos)
+function! s:Completions(arglead, cmdline, cursorpos)
   " Initialize s:bazel_commands if it hasn't been initialized
   if empty(s:bazel_commands)
     let s:bazel_commands = split(system("bazel help completion | awk -F'\"' '/BAZEL_COMMAND_LIST=/ { print $2 }'"))
@@ -154,14 +154,14 @@ function! bazel#Completions(arglead, cmdline, cursorpos)
   " We wrap this function because if completions from bash are used directly,
   " they also include commandline flags which we don't support at the moment
   if exists("g:bazel_bash_completion_path")
-    return bazel#CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
+    return s:CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
   else
     return []
   endif
 endfunction
 " }}}
 
-command! -complete=customlist,bazel#Completions -nargs=+ Bazel :call bazel#Execute(<f-args>)
+command! -complete=customlist,s:Completions -nargs=+ Bazel :call bazel#Execute(<f-args>)
 
 " Test cases
 " ==============================================================================
