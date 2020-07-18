@@ -1,28 +1,28 @@
 function! bazel#PathRelativeToWsRoot(path)
-  let l:full_path = fnamemodify(a:path, ":p")
+  let full_path = fnamemodify(a:path, ":p")
   " cd into the WORKSPACE root
   exe "cd" fnamemodify(findfile("WORKSPACE", ".;"), ":p:h")
   " get path to file relative to current dir (WORKSPACE root)
-  let l:rel_path = fnamemodify(l:full_path, ":.")
+  let rel_path = fnamemodify(full_path, ":.")
   cd -
-  return l:rel_path
+  return rel_path
 endfunction
 
 
 function! bazel#Target(fname)
-  let l:build_file_path = findfile("BUILD", ".;")
-  let l:relative_path = bazel#PathRelativeToWsRoot(l:build_file_path)
-  let l:package_path = fnamemodify(l:relative_path, ":h")
-  let l:package_spec = "//" . l:package_path . "/..."
+  let build_file_path = findfile("BUILD", ".;")
+  let relative_path = bazel#PathRelativeToWsRoot(build_file_path)
+  let package_path = fnamemodify(relative_path, ":h")
+  let package_spec = "//" . package_path . "/..."
 
-  let l:bazel_query_cmd = [
+  let bazel_query_cmd = [
         \ "bazel", "query",
-        \ "'kind(rule, rdeps(" . l:package_spec . ", " . a:fname . ", 1))'",
+        \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'",
         \ "2> /dev/null"
         \ ]
 
-  echo join(l:bazel_query_cmd)
-  return systemlist(join(l:bazel_query_cmd))
+  echo join(bazel_query_cmd)
+  return systemlist(join(bazel_query_cmd))
 endfunction
 
 
@@ -36,40 +36,40 @@ function! bazel#BuildOrTestTargets(targets)
     return a:targets
   endif
 
-  let l:fname = expand("%")
+  let fname = expand("%")
 
   " Is the current file a BUILD file?
-  if fnamemodify(l:fname, ":t") == "BUILD"
-    let l:rel_path = bazel#PathRelativeToWsRoot(l:fname)
-    let l:package_path = fnamemodify(l:rel_path, ":h")
-    return ["//" . l:package_path . ":all"]
+  if fnamemodify(fname, ":t") == "BUILD"
+    let rel_path = bazel#PathRelativeToWsRoot(fname)
+    let package_path = fnamemodify(rel_path, ":h")
+    return ["//" . package_path . ":all"]
   endif
 
   " Assume that the current file is a source file
-  let l:targets = bazel#Target(l:fname)
-  echo "Target: " . join(l:targets)
-  return l:targets
+  let targets = bazel#Target(fname)
+  echo "Target: " . join(targets)
+  return targets
 endfunction
 
 
 function! bazel#Execute(action, ...)
   compiler bazel
-  let l:cmd = [a:action]
+  let cmd = [a:action]
   " We currently do not support flags passed by the
   " user and assume that all the varargs are targets
-  let l:targets = a:000
+  let targets = a:000
 
   " Special handling is required for build and test because we want
   " to support reading errors into the quickfix list and triggering
   " build/test for current file if targets are left unspecified
   if a:action == "build" || a:action == "test"
-    let l:cmd = bazel#BuildOrTestCommand(l:cmd)
-    let l:targets = bazel#BuildOrTestTargets(l:targets)
-  elseif a:action == "run" && len(l:targets) == 0
-    let l:targets = [ bazel#Target(expand("%"))[0] ]
+    let cmd = bazel#BuildOrTestCommand(cmd)
+    let targets = bazel#BuildOrTestTargets(targets)
+  elseif a:action == "run" && len(targets) == 0
+    let targets = [ bazel#Target(expand("%"))[0] ]
   endif
 
-  exe "make" join(l:cmd + l:targets)
+  exe "make" join(cmd + targets)
 endfunction
 
 " Completions for the :Bazel command {{{
@@ -94,46 +94,46 @@ function! bazel#CompletionsFromBash(arglead, line, pos) abort
     return []
   endif
 
-  let l:cmd = substitute(a:line[0:a:pos], '\v\w+', 'bazel', '')
+  let cmd = substitute(a:line[0:a:pos], '\v\w+', 'bazel', '')
 
-  let l:comp_words = split(l:cmd, '\v\s+')
-  if l:cmd =~# '\v\s$'
-    call add(l:comp_words, '')
+  let comp_words = split(cmd, '\v\s+')
+  if cmd =~# '\v\s$'
+    call add(comp_words, '')
   endif
-  let l:comp_line = join(l:comp_words)
+  let comp_line = join(comp_words)
 
   " Note: Bashisms below are intentional. We invoke this via bash explicitly,
   " and it should work correctly even if &shell is actually not bash-compatible.
 
   " Extracts the bash completion command, should be something like:
   " _bazel__complete
-  let l:complete_wrapper_command = ' $(complete -p ' . l:comp_words[0] .
+  let complete_wrapper_command = ' $(complete -p ' . comp_words[0] .
       \ ' | sed "s/.*-F \\([^ ]*\\) .*/\\1/")'
 
   " Build a list of all the arguments that have to be passed in to autocomplete.
-  let l:comp_arguments = {
-      \ 'COMP_LINE' : '"' .l:comp_line . '"',
-      \ 'COMP_WORDS' : '(' . l:comp_line . ')',
-      \ 'COMP_CWORD' : string(len(l:comp_words) - 1),
-      \ 'COMP_POINT' : string(strlen(l:comp_line)),
+  let comp_arguments = {
+      \ 'COMP_LINE' : '"' .comp_line . '"',
+      \ 'COMP_WORDS' : '(' . comp_line . ')',
+      \ 'COMP_CWORD' : string(len(comp_words) - 1),
+      \ 'COMP_POINT' : string(strlen(comp_line)),
       \ }
-  let l:comp_arguments_string =
-      \ join(map(items(l:comp_arguments), 'v:val[0] . "=" . v:val[1]'))
+  let comp_arguments_string =
+      \ join(map(items(comp_arguments), 'v:val[0] . "=" . v:val[1]'))
 
   " Build the command to run with bash
-  let l:shell_script = shellescape(printf(
+  let shell_script = shellescape(printf(
       \ 'source %s; export %s; %s && echo ${COMPREPLY[*]}',
       \ g:bazel_bash_completion_path,
-      \ l:comp_arguments_string,
-      \ l:complete_wrapper_command))
+      \ comp_arguments_string,
+      \ complete_wrapper_command))
 
-  let l:bash_command = 'bash -norc -i -c ' . l:shell_script . ' 2>/dev/null'
-  let l:result = system(l:bash_command)
+  let bash_command = 'bash -norc -i -c ' . shell_script . ' 2>/dev/null'
+  let result = system(bash_command)
 
-  let l:bash_suggestions = split(l:result)
+  let bash_suggestions = split(result)
   " The bash complete not include anything before the colon, add it.
-  let l:word_prefix = substitute(l:comp_words[-1], '\v[^:]+$', '', '')
-  return map(l:bash_suggestions, 'l:word_prefix . v:val')
+  let word_prefix = substitute(comp_words[-1], '\v[^:]+$', '', '')
+  return map(bash_suggestions, 'word_prefix . v:val')
 endfunction
 
 
@@ -145,8 +145,8 @@ function! bazel#Completions(arglead, cmdline, cursorpos)
   endif
 
   " Complete commands
-  let l:cmdlist = split(a:cmdline)
-  if len(l:cmdlist) == 1 || (len(l:cmdlist) == 2 && index(s:bazel_commands, l:cmdlist[-1]) < 0)
+  let cmdlist = split(a:cmdline)
+  if len(cmdlist) == 1 || (len(cmdlist) == 2 && index(s:bazel_commands, cmdlist[-1]) < 0)
     return filter(deepcopy(s:bazel_commands), printf('v:val =~ "^%s"', a:arglead))
   endif
 
