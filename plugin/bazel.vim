@@ -1,1 +1,1 @@
-command! -complete=customlist,s:Completions -nargs=+ Bazel :call bazel#Execute(<f-args>)
+command! -complete=customlist,bazel#Completions -nargs=+ Bazel :call bazel#Execute(<f-args>)

@@ -1,4 +1,4 @@
-function! s:PathRelativeToWsRoot(path)
+function! s:PathRelativeToWsRoot(path) abort
   let full_path = fnamemodify(a:path, ":p")
   " cd into the WORKSPACE root
   exe "cd" fnamemodify(findfile("WORKSPACE", ".;"), ":p:h")
@@ -9,29 +9,33 @@ function! s:PathRelativeToWsRoot(path)
 endfunction
 
 
-function! s:Target(fname)
+function! s:Target(fname) abort
+  compiler bazel
+
   let build_file_path = findfile("BUILD", ".;")
   let relative_path = s:PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
 
+  let stdout = tempname()
+  let stderr = tempname()
   let bazel_query_cmd = [
-        \ "bazel", "query",
+        \ "query", "--noshow_timestamps",
         \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'",
-        \ "2> /dev/null"
+        \ " >" . stdout . " 2>" . stderr . ";",
+        \ "cat " . stderr
         \ ]
+  exe "make" join(bazel_query_cmd)
+  let result = systemlist("cat " . stdout)
 
-  echo join(bazel_query_cmd)
-  return systemlist(join(bazel_query_cmd))
+  if empty(result)
+    throw "Error executing bazel query"
+  endif
+  return result
 endfunction
 
 
-function! s:BuildOrTestCommand(cmd)
-  return a:cmd + ['--noshow_timestamps']
-endfunction
-
-
-function! s:BuildOrTestTargets(targets)
+function! s:BuildOrTestTargets(targets) abort
   if !empty(a:targets)
     return a:targets
   endif
@@ -52,9 +56,11 @@ function! s:BuildOrTestTargets(targets)
 endfunction
 
 
-function! bazel#Execute(action, ...)
+function! bazel#Execute(action, ...) abort
   compiler bazel
-  let cmd = [a:action]
+
+  let cmd = [a:action, '--noshow_timestamps']
+
   " We currently do not support flags passed by the
   " user and assume that all the varargs are targets
   let targets = a:000
@@ -63,7 +69,6 @@ function! bazel#Execute(action, ...)
   " to support reading errors into the quickfix list and triggering
   " build/test for current file if targets are left unspecified
   if a:action == "build" || a:action == "test"
-    let cmd = s:BuildOrTestCommand(cmd)
     let targets = s:BuildOrTestTargets(targets)
   elseif a:action == "run" && len(targets) == 0
     let targets = [ s:Target(expand("%"))[0] ]
@@ -138,7 +143,7 @@ endfunction
 
 
 let s:bazel_commands=[]
-function! s:Completions(arglead, cmdline, cursorpos)
+function! bazel#Completions(arglead, cmdline, cursorpos) abort
   " Initialize s:bazel_commands if it hasn't been initialized
   if empty(s:bazel_commands)
     let s:bazel_commands = split(system("bazel help completion | awk -F'\"' '/BAZEL_COMMAND_LIST=/ { print $2 }'"))
