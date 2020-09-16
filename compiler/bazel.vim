@@ -39,6 +39,7 @@ CompilerSet errorformat+=%f:%l:%c:\ fatal\ %trror:\ %m   " <filename>:<line>:<co
 CompilerSet errorformat+=%f:%l:%c:\ %trror:\ %m          " <filename>:<line>:<col>: error: <message>
 CompilerSet errorformat+=%f:%l:%c:\ %tarning:\ %m        " <filename>:<line>:<col>: warning: <message>
 CompilerSet errorformat+=%f:%l:%c:\ note:\ %m            " <filename>:<line>:<col>: note: <message>
+CompilerSet errorformat+=%f(%l):\ %tarning:\ %m          " <filename>(<line>): warning: <message>
 
 CompilerSet errorformat+=%-G%.%#  " Ignore everything that does not match (%.%# stands for the regex .*)
 
