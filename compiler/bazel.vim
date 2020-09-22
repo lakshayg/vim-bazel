@@ -35,11 +35,12 @@ CompilerSet errorformat+=%Z
 CompilerSet errorformat+=FAIL:\ %m\ (see\ %f)            " FAIL: <test-target> (see <test-log>)
 
 " Errors in the build stage
-CompilerSet errorformat+=%f:%l:%c:\ fatal\ %trror:\ %m   " <filename>:<line>:<col>: fatal error: <message>
-CompilerSet errorformat+=%f:%l:%c:\ %trror:\ %m          " <filename>:<line>:<col>: error: <message>
-CompilerSet errorformat+=%f:%l:%c:\ %tarning:\ %m        " <filename>:<line>:<col>: warning: <message>
-CompilerSet errorformat+=%f:%l:%c:\ note:\ %m            " <filename>:<line>:<col>: note: <message>
-CompilerSet errorformat+=%f(%l):\ %tarning:\ %m          " <filename>(<line>): warning: <message>
+CompilerSet errorformat+=%f:%l:%c:\ fatal\ %trror:\ %m         " <filename>:<line>:<col>: fatal error: <message>
+CompilerSet errorformat+=%f:%l:%c:\ %trror:\ %m                " <filename>:<line>:<col>: error: <message>
+CompilerSet errorformat+=%f:%l:%c:\ %tarning:\ %m              " <filename>:<line>:<col>: warning: <message>
+CompilerSet errorformat+=%f:%l:%c:\ note:\ %m                  " <filename>:<line>:<col>: note: <message>
+CompilerSet errorformat+=%f:%l:%c:\ \ \ requ%tred\ from\ here  " <filename>:<line>:<col>: <message>
+CompilerSet errorformat+=%f(%l):\ %tarning:\ %m                " <filename>(<line>): warning: <message>
 
 CompilerSet errorformat+=%-G%.%#  " Ignore everything that does not match (%.%# stands for the regex .*)
 
