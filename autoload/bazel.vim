@@ -30,19 +30,13 @@ function! s:Target(fname) abort
 
   let stdout = tempname()
   let stderr = tempname()
-  let bazel_query_cmd = [
-        \ "query", "--noshow_timestamps",
-        \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'",
-        \ " >" . stdout . " 2>" . stderr . ";",
-        \ "cat " . stderr
-        \ ]
-  exe s:MakeCommand() join(bazel_query_cmd)
-  let result = systemlist("cat " . stdout)
-
-  if empty(result)
-    throw "Error executing bazel query"
-  endif
-  return result
+  let bazel_query_cmd = 
+        \ "$(" .
+        \ "bazel query --noshow_timestamps " .
+        \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'" .
+        \ ")"
+  echo bazel_query_cmd
+  return [bazel_query_cmd]
 endfunction
 
 
