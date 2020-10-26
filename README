@@ -33,7 +33,7 @@ let g:bazel_bash_completion_path = "/usr/local/etc/bash_completion.d/bazel-compl
 # Async build
 Asynchronous building is available through the [vim-dispatch](https://github.com/tpope/vim-dispatch)
 plugin. If you have vim-dispatch installed, builds will be be run asynchronously
-(in a separate tmux window, in a vim terminal, or in some other way depending on 
+(in a separate tmux pane, in a vim terminal, or in some other way depending on 
 your platform). To disable, you can do
 
 ```
