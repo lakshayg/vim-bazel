@@ -35,7 +35,6 @@ function! s:Target(fname) abort
         \ "bazel query --noshow_timestamps " .
         \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'" .
         \ ")"
-  echo bazel_query_cmd
   return [bazel_query_cmd]
 endfunction
 
