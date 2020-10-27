@@ -34,6 +34,11 @@ CompilerSet errorformat+=%Z
 " Test failures
 CompilerSet errorformat+=FAIL:\ %m\ (see\ %f)            " FAIL: <test-target> (see <test-log>)
 
+" test failures in async builds
+CompilerSet errorformat+=%E%*[\ ]FAILED\ in%m
+CompilerSet errorformat+=%C\ \ %f
+CompilerSet errorformat+=%Z
+
 " Errors in the build stage
 CompilerSet errorformat+=%f:%l:%c:\ fatal\ %trror:\ %m         " <filename>:<line>:<col>: fatal error: <message>
 CompilerSet errorformat+=%f:%l:%c:\ %trror:\ %m                " <filename>:<line>:<col>: error: <message>

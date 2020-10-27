@@ -1,3 +1,14 @@
+" we allow using vim-dispatch to run builds asynchronously if
+" the user has the vim-dispatch plugin
+let g:bazel_enable_async_dispatch = 1
+function! s:MakeCommand()
+  if g:bazel_enable_async_dispatch && exists("g:loaded_dispatch")
+    return "Make"
+  else
+    return "make"
+  endif
+endfunction
+
 function! s:PathRelativeToWsRoot(path) abort
   let full_path = fnamemodify(a:path, ":p")
   " cd into the WORKSPACE root
@@ -19,19 +30,12 @@ function! s:Target(fname) abort
 
   let stdout = tempname()
   let stderr = tempname()
-  let bazel_query_cmd = [
-        \ "query", "--noshow_timestamps",
-        \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'",
-        \ " >" . stdout . " 2>" . stderr . ";",
-        \ "cat " . stderr
-        \ ]
-  exe "make" join(bazel_query_cmd)
-  let result = systemlist("cat " . stdout)
-
-  if empty(result)
-    throw "Error executing bazel query"
-  endif
-  return result
+  let bazel_query_cmd = 
+        \ "$(" .
+        \ "bazel query --noshow_timestamps " .
+        \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'" .
+        \ ")"
+  return [bazel_query_cmd]
 endfunction
 
 
@@ -59,7 +63,7 @@ endfunction
 function! bazel#Execute(action, ...) abort
   compiler bazel
 
-  let cmd = [a:action, '--noshow_timestamps']
+  let cmd = [a:action, '--noshow_timestamps --color=no']
 
   " We currently do not support flags passed by the
   " user and assume that all the varargs are targets
@@ -74,7 +78,7 @@ function! bazel#Execute(action, ...) abort
     let targets = [ s:Target(expand("%"))[0] ]
   endif
 
-  exe "make" join(cmd + targets)
+  exe s:MakeCommand() join(cmd + targets)
 endfunction
 
 " Completions for the :Bazel command {{{
