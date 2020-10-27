@@ -1,13 +1,11 @@
-" we allow using vim-dispatch to run builds asynchronously if
-" the user has the vim-dispatch plugin
-let g:bazel_enable_async_dispatch = 1
+" Use vim-dispatch to run builds asynchronously
 function! s:MakeCommand()
   if g:bazel_enable_async_dispatch && exists("g:loaded_dispatch")
     return "Make"
-  else
-    return "make"
   endif
+  return "make"
 endfunction
+
 
 function! s:PathRelativeToWsRoot(path) abort
   let full_path = fnamemodify(a:path, ":p")
@@ -20,78 +18,71 @@ function! s:PathRelativeToWsRoot(path) abort
 endfunction
 
 
-function! s:Target(fname) abort
-  compiler bazel
+function! s:GetTargetsFromContext() abort
+  let fname = expand("%")
 
+  " Is the current file a BUILD file?
+  if fnamemodify(fname, ":t") ==# "BUILD"
+    let rel_path = s:PathRelativeToWsRoot(fname)
+    let package_path = fnamemodify(rel_path, ":h")
+    return "//" . package_path . ":all"
+  endif
+
+  " Assume that the current file is a source file
   let build_file_path = findfile("BUILD", ".;")
   let relative_path = s:PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
-
-  let stdout = tempname()
-  let stderr = tempname()
-  let bazel_query_cmd = 
-        \ "$(" .
-        \ "bazel query --noshow_timestamps " .
-        \ "'kind(rule, rdeps(" . package_spec . ", " . a:fname . ", 1))'" .
-        \ ")"
-  return [bazel_query_cmd]
-endfunction
-
-
-function! s:BuildOrTestTargets(targets) abort
-  if !empty(a:targets)
-    return a:targets
-  endif
-
-  let fname = expand("%")
-
-  " Is the current file a BUILD file?
-  if fnamemodify(fname, ":t") == "BUILD"
-    let rel_path = s:PathRelativeToWsRoot(fname)
-    let package_path = fnamemodify(rel_path, ":h")
-    return ["//" . package_path . ":all"]
-  endif
-
-  " Assume that the current file is a source file
-  let targets = s:Target(fname)
-  echo "Target: " . join(targets)
-  return targets
+  let fmt = "$(bazel query --noshow_timestamps 'kind(rule, rdeps(%s, %s, 1))')"
+  return printf(fmt, package_spec, fname)
 endfunction
 
 
 function! bazel#Execute(action, ...) abort
-  compiler bazel
+  let flags = ['--noshow_timestamps']
+  let targets = []
 
-  let cmd = [a:action, '--noshow_timestamps --color=no']
+  let i = 0
+  let count = len(a:000)
 
-  " We currently do not support flags passed by the
-  " user and assume that all the varargs are targets
-  let targets = a:000
+  " Add all arguments that start with "--" to flags
+  while i < count && a:000[i] =~ "^--."
+    call add(flags, a:000[i])
+    let i = i + 1
+  endwhile
 
-  " Special handling is required for build and test because we want
-  " to support reading errors into the quickfix list and triggering
-  " build/test for current file if targets are left unspecified
-  if a:action == "build" || a:action == "test"
-    let targets = s:BuildOrTestTargets(targets)
-  elseif a:action == "run" && len(targets) == 0
-    let targets = [ s:Target(expand("%"))[0] ]
+  " Add everything until we find "--" to targets
+  while i < count && a:000[i] !~ "^--"
+    call add(targets, a:000[i])
+    let i = i + 1
+  endwhile
+
+  " Everything that remains gets added to this list
+  let rest = a:000[i:]
+
+  if empty(targets)
+    let targets = [s:GetTargetsFromContext()]
   endif
 
-  exe s:MakeCommand() join(cmd + targets)
+  compiler bazel
+  exe s:MakeCommand() join([a:action] + flags + targets + rest)
 endfunction
+
 
 " Completions for the :Bazel command {{{
 let s:bazel_bash_complete_path_candidates = [
       \ "/etc/bash_completion.d/bazel",
       \ "/usr/local/lib/bazel/bin/bazel-complete.bash"
       \ ]
-for f in s:bazel_bash_complete_path_candidates
-  if filereadable(f)
-    let g:bazel_bash_completion_path = f
-  endif
-endfor
 
+if !exists("g:bazel_bash_completion_path")
+  let candidates = filter(
+        \ s:bazel_bash_complete_path_candidates,
+        \ 'filereadable(v:val)')
+  if !empty(candidates)
+    let g:bazel_bash_completion_path = candidates[0]
+  endif
+endif
 
 " Completions are extracted from the bash bazel completion function.
 " Taken from https://github.com/bazelbuild/vim-bazel/blob/master/autoload/bazel.vim
@@ -161,12 +152,10 @@ function! bazel#Completions(arglead, cmdline, cursorpos) abort
 
   " Complete targets by using the bash completion logic
   " We wrap this function because if completions from bash are used directly,
-  " they also include commandline flags which we don't support at the moment
-  if exists("g:bazel_bash_completion_path")
-    return s:CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
-  else
-    return []
-  endif
+  " they also include commandline flags which users don't need in most cases
+  return exists("g:bazel_bash_completion_path")
+        \ ? s:CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
+        \ : []
 endfunction
 " }}}
 
