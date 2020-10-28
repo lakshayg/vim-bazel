@@ -39,7 +39,7 @@ endfunction
 
 
 function! bazel#Execute(action, ...) abort
-  let flags = ['--noshow_timestamps']
+  let flags = ['--noshow_timestamps', '--color=no']
   let targets = []
 
   let i = 0
