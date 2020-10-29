@@ -1,7 +1,13 @@
-" Should we use asynchronous builds?
-" This requires tpope/vim-dispatch
-if !exists('g:bazel_enable_async_dispatch')
-  let g:bazel_enable_async_dispatch = 1
+" This can use used to enable asynchronous builds. See README
+if !exists('g:bazel_make_command')
+  let g:bazel_make_command = "make"
+endif
+
+" Set to 0 if more context in bazel error messages is needed.
+" This will load everything from stdout into the quickfix list
+" without filtering anything. By default, filtering is enabled
+if !exists('g:bazel_filter_aggressively')
+  let g:bazel_filter_aggressively = 1
 endif
 
 " Bash completion script path for bazel.

@@ -1,12 +1,3 @@
-" Use vim-dispatch to run builds asynchronously
-function! s:MakeCommand()
-  if g:bazel_enable_async_dispatch && exists("g:loaded_dispatch")
-    return "Make"
-  endif
-  return "make"
-endfunction
-
-
 function! s:PathRelativeToWsRoot(path) abort
   let full_path = fnamemodify(a:path, ":p")
   " cd into the WORKSPACE root
@@ -65,7 +56,7 @@ function! bazel#Execute(action, ...) abort
   endif
 
   compiler bazel
-  exe s:MakeCommand() join([a:action] + flags + targets + rest)
+  exe g:bazel_make_command join([a:action] + flags + targets + rest)
 endfunction
 
 

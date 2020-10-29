@@ -4,7 +4,7 @@ This plugin allows invoking bazel from vim
 
 # Commands
 
-:Bazel {command} [targets...]
+:Bazel {command} [arguments...]
 
 This is identical to calling :!bazel {command} [arguments...] except
 when the command is "build" or "test", in which case, it provides some
@@ -30,20 +30,26 @@ on your system see: https://docs.bazel.build/versions/master/completion.html
 
 let g:bazel_bash_completion_path = "/usr/local/etc/bash_completion.d/bazel-complete.bash"
 
-# Asynchronous build
+# Asynchronous builds
 
-vim-bazel can use [tpope/vim-dispatch][1] to run builds asynchronously. If
-vim-dispatch is installed, it will be used to launch builds in a separate tmux
-pane, in a vim terminal, or in some other way depending on your platform. This
-can be disabled by setting:
+vim-bazel can be used with async plugins to run builds in the background.
+This can be done by setting g:bazel_make_command. Here are some examples
+on how to set this up with various plugins:
 
-```
-let g:bazel_enable_async_dispatch = 0
-```
+tpope/vim-dispatch        let g:bazel_make_command = "Make"
+skywind3000/asyncrun.vim  let g:bazel_make_command = "AsyncRun -program=make"
+hauleth/asyncdo.vim       let g:bazel_make_command = "AsyncDo bazel"
 
-# Missing Features
+# Error Filtering
+
+This plugin filters errors using regexes. By default, only the messages
+that match the regexes are loaded into the quickfix list. However, the
+user might sometimes want to load all the messages without filtering. This
+can be done by setting:
+
+let g:bazel_filter_aggressively = 0
+
+# Might do in the future
 
 * Unit tests
 * Support for languages besides C++
-
-[1]: https://github.com/tpope/vim-dispatch
