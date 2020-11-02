@@ -55,8 +55,13 @@ function! bazel#Execute(action, ...) abort
     let targets = [s:GetTargetsFromContext()]
   endif
 
+  let filter_aggressively = g:bazel_filter_aggressively
+  if a:action ==# "run"
+    let g:bazel_filter_aggressively = 0
+  endif
   compiler bazel
   exe g:bazel_make_command join([a:action] + flags + targets + rest)
+  let g:bazel_filter_aggressively = filter_aggressively
 endfunction
 
 
