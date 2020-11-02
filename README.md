@@ -2,9 +2,11 @@
 
 This plugin allows invoking bazel from vim
 
-# Commands
+## Commands
 
+```
 :Bazel {command} [arguments...]
+```
 
 This is identical to calling :!bazel {command} [arguments...] except
 when the command is "build" or "test", in which case, it provides some
@@ -20,7 +22,7 @@ niceties
 Note: It is currently tuned for C++ development in the sense that the
 errorformat is set to recognize error messages from gcc/clang
 
-# Command completion
+## Command completion
 
 To enable completion of targets in bazel commands, vim-bazel tries to
 determine the location of the bazel bash completion script. If target
@@ -28,28 +30,34 @@ completion does not work, set g:bazel_bash_completion_path to the path
 of the bazel bash completion script on your system. To locate the script
 on your system see: https://docs.bazel.build/versions/master/completion.html
 
+```
 let g:bazel_bash_completion_path = "/usr/local/etc/bash_completion.d/bazel-complete.bash"
+```
 
-# Asynchronous builds
+## Asynchronous builds
 
 vim-bazel can be used with async plugins to run builds in the background.
 This can be done by setting g:bazel_make_command. Here are some examples
 on how to set this up with various plugins:
 
+```
 tpope/vim-dispatch        let g:bazel_make_command = "Make"
 skywind3000/asyncrun.vim  let g:bazel_make_command = "AsyncRun -program=make"
 hauleth/asyncdo.vim       let g:bazel_make_command = "AsyncDo bazel"
+```
 
-# Error Filtering
+## Error Filtering
 
 This plugin filters errors using regexes. By default, only the messages
 that match the regexes are loaded into the quickfix list. However, the
 user might sometimes want to load all the messages without filtering. This
 can be done by setting:
 
+```
 let g:bazel_filter_aggressively = 0
+```
 
-# Might do in the future
+## Might do in the future
 
 * Unit tests
 * Support for languages besides C++
