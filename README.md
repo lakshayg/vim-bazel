@@ -19,6 +19,12 @@ niceties
 * If the current file is a BUILD file, calls the command for all the
   targets in the BUILD file
 
+Some other general improvements:
+
+* Adds bazel-bin and bazel-<project> to the path so `gf` and other
+  related command work seamlessly
+* Provides the :Bld command to jump to BUILD files
+
 Note: It is currently tuned for C++ development in the sense that the
 errorformat is set to recognize error messages from gcc/clang
 
