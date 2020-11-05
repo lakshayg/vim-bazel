@@ -1,3 +1,8 @@
+" No need to continue if we are not in a bazel project
+if empty(findfile("WORKSPACE", ".;"))
+  finish
+endif
+
 " This can use used to enable asynchronous builds. See README
 if !exists('g:bazel_make_command')
   let g:bazel_make_command = "make"
