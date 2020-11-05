@@ -1,3 +1,12 @@
+" Jump to build file and search for filename where this command was called
+function! bazel#JumpToBuildFile()
+  let current_file = expand("%:t")
+  let pattern = "\\V\\<" . current_file . "\\>"
+  exe "edit" findfile("BUILD", ".;")
+  call search(pattern, "w", 0, 500)
+endfunction
+
+
 function! s:PathRelativeToWsRoot(path) abort
   let full_path = fnamemodify(a:path, ":p")
   " cd into the WORKSPACE root

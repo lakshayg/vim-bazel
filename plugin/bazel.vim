@@ -20,5 +20,9 @@ endif
 " need to, consider sending a PR to add it to the search list.
 " let g:bazel_bash_completion_path = ...
 
+" Jump to the BUILD file corresponding to current source file
+command! Bld :call bazel#JumpToBuildFile()
+
+" Call bazel command
 command! -complete=customlist,bazel#Completions -nargs=+
       \ Bazel :call bazel#Execute(<f-args>)
