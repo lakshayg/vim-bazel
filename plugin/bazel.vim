@@ -20,6 +20,12 @@ endif
 " need to, consider sending a PR to add it to the search list.
 " let g:bazel_bash_completion_path = ...
 
+" Add bazel-bin and bazel-<project> to the path
+if isdirectory("bazel-bin")
+  let &path = &path . "," . resolve("bazel-bin")
+  let &path = &path . "," . resolve("bazel-" . fnamemodify(getcwd(), ":t"))
+endif
+
 " Jump to the BUILD file corresponding to current source file
 command! Bld :call bazel#JumpToBuildFile()
 
