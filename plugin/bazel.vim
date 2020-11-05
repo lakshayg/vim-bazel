@@ -26,6 +26,12 @@ if isdirectory("bazel-bin")
   let &path = &path . "," . resolve("bazel-" . fnamemodify(getcwd(), ":t"))
 endif
 
+augroup VimBazel
+  autocmd!
+  " Resolve references to external/ paths in the quickfix list
+  autocmd QuickFixCmdPost make :call bazel#ResolveQuickfixPaths()
+augroup END
+
 " Jump to the BUILD file corresponding to current source file
 command! Bld :call bazel#JumpToBuildFile()
 
