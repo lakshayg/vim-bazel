@@ -61,6 +61,17 @@ function! s:GetTargetsFromContext() abort
   return printf(fmt, package_spec, fname)
 endfunction
 
+let s:bazel_log_file = ""
+
+function! bazel#ReadLastLog()
+  if empty(s:bazel_log_file)
+    echohl WarningMsg
+    echo "No bazel command has been run"
+    echohl None
+    return
+  endif
+  exe "edit" s:bazel_log_file
+endfunction
 
 function! bazel#Execute(action, ...) abort
   let flags = ['--noshow_timestamps', '--color=no']
@@ -93,7 +104,10 @@ function! bazel#Execute(action, ...) abort
     let g:bazel_filter_aggressively = 0
   endif
   compiler bazel
-  exe g:bazel_make_command join([a:action] + flags + targets + rest)
+  let s:bazel_log_file = tempname()
+  exe g:bazel_make_command join(
+        \ [a:action] + flags + targets + rest +
+        \ ["2>&1 | tee", s:bazel_log_file])
   let g:bazel_filter_aggressively = filter_aggressively
 endfunction
 

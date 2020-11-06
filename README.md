@@ -63,6 +63,13 @@ can be done by setting:
 let g:bazel_filter_aggressively = 0
 ```
 
+An alternative is to use the BazelLog command which loads a buffer
+containing all the output from the last bazel command
+
+```
+:BazelLog
+```
+
 ## Might do in the future
 
 * Unit tests
