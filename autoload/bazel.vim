@@ -57,7 +57,7 @@ function! s:GetTargetsFromContext() abort
   let relative_path = s:PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
-  let fmt = "$(bazel query --noshow_timestamps 'kind(rule, rdeps(%s, %s, 1))')"
+  let fmt = "$(bazel cquery --noshow_timestamps 'kind(rule, rdeps(%s, %s, 1))' | cut -d' ' -f1)"
   return printf(fmt, package_spec, fname)
 endfunction
 
