@@ -1,0 +1,64 @@
+*bazel.txt*  bazel integration for vim.
+
+Author: Lakshay Garg <lakshayg@outlook.in>
+License: MIT
+
+INTRODUCTION                                *bazel* *compiler-bazel*
+
+This plugin essentially provides a bazel |compiler| plugin and some plumbing
+around it to handle bazel quirks and make it work nicely with vim.
+
+Note: The compiler plugin is set to recognize gcc / clang error messages and
+will not be very useful for other programming languages in its current state.
+
+COMMANDS                                    *bazel-commands*
+
+                                            *bazel-:Bazel* *:Bazel*
+:Bazel build [targets]  These commands are the only reason to use this plugin.
+:Bazel test  [targets]  They activate the bazel compiler plugin and forward to
+                        `:make`. [targets] are the bazel targets to build / test
+                        and can be auto-completed using the <Tab> key. If left
+                        unspecified, the plugin tries to determine the target
+                        for the current buffer using a bazel query. When the
+                        current buffer is a BUILD file, all the targets in the
+                        file are built / tested.
+
+                                            *bazel-:BazelLog*
+:BazelLog               Loads a text file containing the stdout and stderr of
+                        the last bazel command run through the plugin. This is
+                        useful mainly when the user needs more context around
+                        compiler errors or if the user called `:Bazel run` and
+                        wants to see the output.
+
+                                            *bazel-:Bld*
+:Bld                    Jumps to the BUILD file for the current buffer.
+
+VARIABLES                                   *bazel-variables*
+
+                                            *bazel-g:bazel_bash_completion_path*
+g:bazel_bash_completion_path  The plugin uses the bazel bash completion script
+                        for target completions. If the script is not found in
+                        its usual locations, the user can locate it manually &
+                        set this variable to the full path of the script. See:
+                        https://docs.bazel.build/versions/master/completion.html
+
+                                            *bazel-g:bazel_make_command*
+g:bazel_make_command    This plugin can be used with async plugins to run
+                        bazel asynchronously. This variable must be set to
+                        the `:make` replacement provided by the async plugin.
+                        Here are some examples:
+
+>
+                        tpope/vim-dispatch       => "Make"
+                        skywind3000/asyncrun.vim => "AsyncRun -program=make"
+                        hauleth/asyncdo.vim      => "AsyncDo bazel"
+<
+
+                                            *bazel-g:bazel_filter_aggressively*
+g:bazel_filter_aggressively      The plugin loads only the errors that match
+                        regular expressions defined by the bazel compiler plugin.
+                        If the user prefers having complete error messages in the
+                        quickfix list, it can be achieved by setting this to 0.
+                        Defaults to 1. See also: |bazel-:BazelLog|
+
+ vim:tw=78:et:ft=help:norl:
