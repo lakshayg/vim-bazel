@@ -1,3 +1,13 @@
+function! bazel#ModifyPath(bazel_root)
+  if !isdirectory(a:bazel_root . "/bazel-bin")
+    return
+  endif
+
+  let project_dir = fnamemodify(a:bazel_root, ":t")
+  let &path = &path . "," . resolve(a:bazel_root . "/bazel-bin")
+  let &path = &path . "," . resolve(a:bazel_root . "/bazel-" . project_dir)
+endfunction
+
 " Compiler errors will often refer to files relative to bazel-bin
 " or bazel-<project>. This function looks for all such files in the
 " quickfix list and updates their path so that they can be jumped to

@@ -1,9 +1,12 @@
+let s:bazel_workspace_file = findfile("WORKSPACE", ".;")
+
 " No need to continue if we are not in a bazel project
-if empty(findfile("WORKSPACE", ".;"))
+if empty(s:bazel_workspace_file)
   finish
 endif
 
-" This can use used to enable asynchronous builds. See README
+" This can use used to enable asynchronous builds.
+" See :help bazel-g:bazel_make_command
 if !exists('g:bazel_make_command')
   let g:bazel_make_command = "make"
 endif
@@ -21,10 +24,7 @@ endif
 " let g:bazel_bash_completion_path = ...
 
 " Add bazel-bin and bazel-<project> to the path
-if isdirectory("bazel-bin")
-  let &path = &path . "," . resolve("bazel-bin")
-  let &path = &path . "," . resolve("bazel-" . fnamemodify(getcwd(), ":t"))
-endif
+call bazel#ModifyPath(fnamemodify(s:bazel_workspace_file, ":p:h"))
 
 augroup VimBazel
   autocmd!
