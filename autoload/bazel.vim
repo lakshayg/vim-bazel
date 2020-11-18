@@ -3,7 +3,10 @@
 " quickfix list and updates their path so that they can be jumped to
 " though the quickfix list
 function! bazel#ResolveQuickfixPaths()
-  let qflist = getqflist()
+  let tmp = getqflist({"items": [], "title": ""})
+  let qflist = tmp["items"]
+  let title = tmp["title"]
+
   for loc in qflist
     let name = bufname(loc.bufnr)
     if filereadable(name)
@@ -18,7 +21,8 @@ function! bazel#ResolveQuickfixPaths()
 
     let loc.bufnr = bufnr(found, 1)
   endfor
-  call setqflist(qflist, 'r')
+
+  call setqflist(qflist, 'r', {"title": title})
 endfunction
 
 
@@ -73,6 +77,17 @@ function! bazel#ReadLastLog()
   exe "edit" s:bazel_log_file
 endfunction
 
+function! bazel#SetCompiler(action)
+  compiler bazel
+  " Ignore everything that does not match (%.%# stands for the regex .*). The
+  " catchall regex has been added twice to prevent tpope/vim-dispatch from
+  " completely removing it from errorformat. See this thread for more context:
+  " https://github.com/tpope/vim-dispatch/issues/76
+  if (g:bazel_filter_aggressively == 1) && (a:action != "run")
+    setlocal errorformat+=%-G%.%#,%-G%.%#
+  endif
+endfunction
+
 function! bazel#Execute(action, ...) abort
   let flags = ['--noshow_timestamps', '--color=no']
   let targets = []
@@ -99,16 +114,11 @@ function! bazel#Execute(action, ...) abort
     let targets = [s:GetTargetsFromContext()]
   endif
 
-  let filter_aggressively = g:bazel_filter_aggressively
-  if a:action ==# "run"
-    let g:bazel_filter_aggressively = 0
-  endif
-  compiler bazel
+  call bazel#SetCompiler(a:action)
   let s:bazel_log_file = tempname()
   exe g:bazel_make_command join(
         \ [a:action] + flags + targets + rest +
         \ ["2>&1 | tee", s:bazel_log_file])
-  let g:bazel_filter_aggressively = filter_aggressively
 endfunction
 
 

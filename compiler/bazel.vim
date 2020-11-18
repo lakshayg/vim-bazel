@@ -47,13 +47,5 @@ CompilerSet errorformat+=%f:%l:%c:\ note:\ %m                  " <filename>:<lin
 CompilerSet errorformat+=%f:%l:%c:\ \ \ requ%tred\ from\ here  " <filename>:<line>:<col>: <message>
 CompilerSet errorformat+=%f(%l):\ %tarning:\ %m                " <filename>(<line>): warning: <message>
 
-" Ignore everything that does not match (%.%# stands for the regex .*). The
-" catchall regex has been added twice to prevent tpope/vim-dispatch from
-" completely removing it from errorformat. See this thread for more context:
-" https://github.com/tpope/vim-dispatch/issues/76
-if g:bazel_filter_aggressively == 1
-  CompilerSet errorformat+=%-G%.%#,%-G%.%#
-endif
-
 let &cpo = s:cpo_save
 unlet s:cpo_save
