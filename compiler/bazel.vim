@@ -21,8 +21,8 @@ CompilerSet makeprg=bazel
 " Ignore this error message, it is always redundant
 " ERROR: <filename>:<line>:<col>: C++ compilation of rule '<target>' failed (Exit 1)
 CompilerSet errorformat=%-GERROR:\ %f:%l:%c:\ C++\ compilation\ of\ rule\ %m
-CompilerSet errorformat+=%tRROR:\ %f:%l:%c:\ %m  " Generic bazel error handler
-
+CompilerSet errorformat+=%tRROR:\ %f:%l:%c:\ %m   " Generic bazel error handler
+CompilerSet errorformat+=%tARNING:\ %f:%l:%c:\ %m " Generic bazel warning handler
 " this rule is missing dependency declarations for the following files included by '<another-filename>'
 "   '<fname-1>'
 "   '<fname-2>'
@@ -46,6 +46,7 @@ CompilerSet errorformat+=%f:%l:%c:\ %tarning:\ %m              " <filename>:<lin
 CompilerSet errorformat+=%f:%l:%c:\ note:\ %m                  " <filename>:<line>:<col>: note: <message>
 CompilerSet errorformat+=%f:%l:%c:\ \ \ requ%tred\ from\ here  " <filename>:<line>:<col>: <message>
 CompilerSet errorformat+=%f(%l):\ %tarning:\ %m                " <filename>(<line>): warning: <message>
+CompilerSet errorformat+=%f:%l:\ %m                            " <filename>:<line>: <message>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
