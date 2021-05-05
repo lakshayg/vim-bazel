@@ -23,6 +23,8 @@ CompilerSet makeprg=bazel
 CompilerSet errorformat=%-GERROR:\ %f:%l:%c:\ C++\ compilation\ of\ rule\ %m
 CompilerSet errorformat+=%tRROR:\ %f:%l:%c:\ %m   " Generic bazel error handler
 CompilerSet errorformat+=%tARNING:\ %f:%l:%c:\ %m " Generic bazel warning handler
+CompilerSet errorformat+=%tEBUG:\ %f:%l:%c:\ %m   " Generic bazel debug handler
+
 " this rule is missing dependency declarations for the following files included by '<another-filename>'
 "   '<fname-1>'
 "   '<fname-2>'
