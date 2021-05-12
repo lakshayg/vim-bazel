@@ -32,7 +32,8 @@ function! bazel#ResolveQuickfixPaths()
     let loc.bufnr = bufnr(found, 1)
   endfor
 
-  call setqflist(qflist, 'r', {"title": title})
+  call setqflist(qflist, 'r')
+  call setqflist([], 'r', {"title": title})
 endfunction
 
 
