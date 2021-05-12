@@ -23,13 +23,6 @@ COMMANDS                                    *bazel-commands*
                         current buffer is a BUILD file, all the targets in the
                         file are built / tested.
 
-                                            *bazel-:BazelLog*
-:BazelLog               Loads a text file containing the stdout and stderr of
-                        the last bazel command run through the plugin. This is
-                        useful mainly when the user needs more context around
-                        compiler errors or if the user called `:Bazel run` and
-                        wants to see the output.
-
                                             *bazel-:Bld*
 :Bld                    Jumps to the BUILD file for the current buffer.
 
@@ -59,6 +52,6 @@ g:bazel_filter_aggressively      The plugin loads only the errors that match
                         regular expressions defined by the bazel compiler plugin.
                         If the user prefers having complete error messages in the
                         quickfix list, it can be achieved by setting this to 0.
-                        Defaults to 1. See also: |bazel-:BazelLog|
+                        Defaults to 1.
 
  vim:tw=78:et:ft=help:norl:

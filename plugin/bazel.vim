@@ -35,9 +35,6 @@ augroup END
 " Jump to the BUILD file corresponding to current source file
 command! Bld :call bazel#JumpToBuildFile()
 
-" Read the entire output from the last bazel command
-command! BazelLog :call bazel#ReadLastLog()
-
 " Call bazel command
 command! -complete=customlist,bazel#Completions -nargs=+
       \ Bazel :call bazel#Execute(<f-args>)

@@ -75,18 +75,6 @@ function! s:GetTargetsFromContext() abort
   return printf(fmt, package_spec, fname)
 endfunction
 
-let s:bazel_log_file = ""
-
-function! bazel#ReadLastLog()
-  if empty(s:bazel_log_file)
-    echohl WarningMsg
-    echo "No bazel command has been run"
-    echohl None
-    return
-  endif
-  exe "edit" s:bazel_log_file
-endfunction
-
 function! bazel#SetCompiler(action)
   compiler bazel
   " Ignore everything that does not match (%.%# stands for the regex .*). The
@@ -125,10 +113,8 @@ function! bazel#Execute(action, ...) abort
   endif
 
   call bazel#SetCompiler(a:action)
-  let s:bazel_log_file = tempname()
   exe g:bazel_make_command join(
-        \ [a:action] + flags + targets + rest +
-        \ ["2>&1 | tee", s:bazel_log_file])
+        \ [a:action] + flags + targets + rest)
 endfunction
 
 
