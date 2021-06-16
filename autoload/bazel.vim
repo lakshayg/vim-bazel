@@ -92,16 +92,15 @@ function! bazel#Execute(action, ...) abort
   let targets = []
 
   let i = 0
-  let count = len(a:000)
 
   " Add all arguments that start with "--" to flags
-  while i < count && a:000[i] =~ "^--."
+  while i < a:0 && a:000[i] =~ "^--."
     call add(flags, a:000[i])
     let i = i + 1
   endwhile
 
   " Add everything until we find "--" to targets
-  while i < count && a:000[i] !~ "^--"
+  while i < a:0 && a:000[i] !~ "^--"
     call add(targets, a:000[i])
     let i = i + 1
   endwhile
