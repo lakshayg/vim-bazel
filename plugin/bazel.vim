@@ -11,11 +11,10 @@ if !exists('g:bazel_make_command')
   let g:bazel_make_command = "make"
 endif
 
-" Set to 0 if more context in bazel error messages is needed.
-" This will load everything from stdout into the quickfix list
-" without filtering anything. By default, filtering is enabled
+" Set to 1 if only matched errors should be loaded.
+" By default, filtering is disabled
 if !exists('g:bazel_filter_aggressively')
-  let g:bazel_filter_aggressively = 1
+  let g:bazel_filter_aggressively = 0
 endif
 
 " Bash completion script path for bazel.

@@ -48,10 +48,10 @@ g:bazel_make_command    This plugin can be used with async plugins to run
 <
 
                                             *bazel-g:bazel_filter_aggressively*
-g:bazel_filter_aggressively      The plugin loads only the errors that match
-                        regular expressions defined by the bazel compiler plugin.
-                        If the user prefers having complete error messages in the
-                        quickfix list, it can be achieved by setting this to 0.
-                        Defaults to 1.
+g:bazel_filter_aggressively      The plugin loads the complete output from the
+                        compiler into the quickfix list. If the user wants to
+                        load only the errors that match the regular expressions
+                        defined by the compiler plugin, this can be set to 1.
+                        Defaults to 0.
 
  vim:tw=78:et:ft=help:norl:
