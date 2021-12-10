@@ -1,7 +1,7 @@
 *bazel.txt*  bazel integration for vim.
 
 Author: Lakshay Garg <lakshayg@outlook.in>
-License: MIT
+License: Same terms as Vim itself (see |license|)
 
 INTRODUCTION                                *bazel* *compiler-bazel*
 

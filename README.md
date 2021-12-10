@@ -67,3 +67,7 @@ let g:bazel_filter_aggressively = 1
 
 * Unit tests
 * Support for languages besides C++
+
+## License
+
+Copyright (c) Lakshay Garg. Distributed under the same terms as Vim itself. See `:help license`.
