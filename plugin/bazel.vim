@@ -6,7 +6,7 @@ if empty(s:bazel_workspace_file)
 endif
 
 " Bash completion script path for bazel.
-" In most cases, the use should not need to set it. In case you
+" In most cases, the user should not need to set it. In case you
 " need to, consider sending a PR to add it to the search list.
 " let g:bazel_bash_completion_path = ...
 

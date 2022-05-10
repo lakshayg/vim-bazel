@@ -33,7 +33,7 @@ g:bazel_bash_completion_path  The plugin uses the bazel bash completion script
                         for target completions. If the script is not found in
                         its usual locations, the user can locate it manually &
                         set this variable to the full path of the script. See:
-                        https://docs.bazel.build/versions/master/completion.html
+                        https://bazel.build/install/completion
 
                                             *bazel-g:bazel_make_command*
 g:bazel_make_command    This plugin can be used with async plugins to run

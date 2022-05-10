@@ -34,7 +34,7 @@ To enable completion of targets in bazel commands, vim-bazel tries to
 determine the location of the bazel bash completion script. If target
 completion does not work, set g:bazel_bash_completion_path to the path
 of the bazel bash completion script on your system. To locate the script
-on your system see: https://docs.bazel.build/versions/master/completion.html
+on your system see: https://bazel.build/install/completion
 
 ```
 let g:bazel_bash_completion_path = "/usr/local/etc/bash_completion.d/bazel-complete.bash"
