@@ -113,7 +113,7 @@ function! bazel#Execute(action, ...) abort
   endif
 
   call bazel#SetCompiler(a:action)
-  exe g:bazel_make_command join(
+  exe get(g:, "bazel_make_command", "make") join(
         \ [a:action] + flags + targets + rest)
 endfunction
 

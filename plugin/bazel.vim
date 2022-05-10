@@ -5,12 +5,6 @@ if empty(s:bazel_workspace_file)
   finish
 endif
 
-" This can use used to enable asynchronous builds.
-" See :help bazel-g:bazel_make_command
-if !exists('g:bazel_make_command')
-  let g:bazel_make_command = "make"
-endif
-
 " Set to 1 if only matched errors should be loaded.
 " By default, filtering is disabled
 if !exists('g:bazel_filter_aggressively')
