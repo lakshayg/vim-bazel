@@ -5,12 +5,6 @@ if empty(s:bazel_workspace_file)
   finish
 endif
 
-" Set to 1 if only matched errors should be loaded.
-" By default, filtering is disabled
-if !exists('g:bazel_filter_aggressively')
-  let g:bazel_filter_aggressively = 0
-endif
-
 " Bash completion script path for bazel.
 " In most cases, the use should not need to set it. In case you
 " need to, consider sending a PR to add it to the search list.

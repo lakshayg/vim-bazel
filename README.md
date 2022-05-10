@@ -52,17 +52,6 @@ skywind3000/asyncrun.vim  let g:bazel_make_command = "AsyncRun -program=make"
 hauleth/asyncdo.vim       let g:bazel_make_command = "AsyncDo bazel"
 ```
 
-## Error Filtering
-
-This plugin filters errors using regexes. By default, all the messages
-from the compiler are loaded into the quickfix list. Some users might
-want to load only the errors that match the regexes defined by the plugin.
-This can be done by setting:
-
-```
-let g:bazel_filter_aggressively = 1
-```
-
 ## Might do in the future
 
 * Unit tests

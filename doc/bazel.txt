@@ -47,11 +47,4 @@ g:bazel_make_command    This plugin can be used with async plugins to run
                         hauleth/asyncdo.vim      => "AsyncDo bazel"
 <
 
-                                            *bazel-g:bazel_filter_aggressively*
-g:bazel_filter_aggressively      The plugin loads the complete output from the
-                        compiler into the quickfix list. If the user wants to
-                        load only the errors that match the regular expressions
-                        defined by the compiler plugin, this can be set to 1.
-                        Defaults to 0.
-
- vim:tw=78:et:ft=help:norl:
+vim:tw=78:et:ft=help:norl:

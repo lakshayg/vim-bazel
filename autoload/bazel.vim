@@ -76,17 +76,6 @@ function! s:GetTargetsFromContext() abort
   return printf(fmt, package_spec, fname)
 endfunction
 
-function! bazel#SetCompiler(action)
-  compiler bazel
-  " Ignore everything that does not match (%.%# stands for the regex .*). The
-  " catchall regex has been added twice to prevent tpope/vim-dispatch from
-  " completely removing it from errorformat. See this thread for more context:
-  " https://github.com/tpope/vim-dispatch/issues/76
-  if (g:bazel_filter_aggressively == 1) && (a:action != "run")
-    setlocal errorformat+=%-G%.%#,%-G%.%#
-  endif
-endfunction
-
 function! bazel#Execute(action, ...) abort
   let flags = ['--noshow_timestamps', '--color=no']
   let targets = []
@@ -112,7 +101,7 @@ function! bazel#Execute(action, ...) abort
     let targets = [s:GetTargetsFromContext()]
   endif
 
-  call bazel#SetCompiler(a:action)
+  compiler bazel
   exe get(g:, "bazel_make_command", "make") join(
         \ [a:action] + flags + targets + rest)
 endfunction
