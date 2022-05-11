@@ -106,22 +106,7 @@ function! bazel#Execute(action, ...) abort
         \ [a:action] + flags + targets + rest)
 endfunction
 
-
 " Completions for the :Bazel command {{{
-let s:bazel_bash_complete_path_candidates = [
-      \ "/etc/bash_completion.d/bazel",
-      \ "/usr/local/lib/bazel/bin/bazel-complete.bash"
-      \ ]
-
-if !exists("g:bazel_bash_completion_path")
-  let candidates = filter(
-        \ s:bazel_bash_complete_path_candidates,
-        \ 'filereadable(v:val)')
-  if !empty(candidates)
-    let g:bazel_bash_completion_path = candidates[0]
-  endif
-endif
-
 " Completions are extracted from the bash bazel completion function.
 " Taken from https://github.com/bazelbuild/vim-bazel/blob/master/autoload/bazel.vim
 " with minor modifications
