@@ -62,14 +62,14 @@ function! s:GetTargetsFromContext() abort
 
   " Is the current file a BUILD file?
   if fnamemodify(fname, ":t") ==# "BUILD"
-    let rel_path = s:PathRelativeToWsRoot(fname)
+    let rel_path = <SID>PathRelativeToWsRoot(fname)
     let package_path = fnamemodify(rel_path, ":h")
     return "//" . package_path . ":all"
   endif
 
   " Assume that the current file is a source file
   let build_file_path = findfile("BUILD", ".;")
-  let relative_path = s:PathRelativeToWsRoot(build_file_path)
+  let relative_path = <SID>PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
   let fmt = "$(bazel cquery --noshow_timestamps 'kind(rule, rdeps(%s, %s, 1))' | cut -d' ' -f1)"
@@ -98,7 +98,7 @@ function! bazel#Execute(action, ...) abort
   let rest = a:000[i:]
 
   if empty(targets)
-    let targets = [s:GetTargetsFromContext()]
+    let targets = [<SID>GetTargetsFromContext()]
   endif
 
   compiler bazel
@@ -177,7 +177,7 @@ function! bazel#Completions(arglead, cmdline, cursorpos) abort
   " We wrap this function because if completions from bash are used directly,
   " they also include commandline flags which users don't need in most cases
   return exists("g:bazel_bash_completion_path")
-        \ ? s:CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
+        \ ? <SID>CompletionsFromBash(a:arglead, a:cmdline, a:cursorpos)
         \ : []
 endfunction
 " }}}
