@@ -72,12 +72,12 @@ function! s:GetTargetsFromContext() abort
   let relative_path = <SID>PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
-  let fmt = "$(bazel cquery --noshow_timestamps --output=starlark 'kind(rule, rdeps(%s, %s, 1))')"
+  let fmt = "$(bazel cquery --collapse_duplicate_defines --noshow_timestamps --output=starlark 'kind(rule, rdeps(%s, %s, 1))')"
   return printf(fmt, package_spec, fname)
 endfunction
 
 function! bazel#Execute(action, ...) abort
-  let flags = ['--noshow_timestamps', '--color=no']
+  let flags = ['--collapse_duplicate_defines', '--noshow_timestamps', '--color=no']
   let targets = []
 
   let i = 0
