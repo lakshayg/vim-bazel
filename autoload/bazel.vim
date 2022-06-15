@@ -56,7 +56,6 @@ function! s:PathRelativeToWsRoot(path) abort
   return rel_path
 endfunction
 
-
 function! s:GetTargetsFromContext() abort
   let fname = expand("%")
 
