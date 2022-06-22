@@ -17,6 +17,9 @@ CompilerSet makeprg=bazel
 " * errorformat reference: http://vimdoc.sourceforge.net/htmldoc/quickfix.html#errorformat
 " * look for message without consuming: https://stackoverflow.com/a/36959245/10923940
 " * errorformat explanation: https://stackoverflow.com/a/29102995/10923940
+"
+" Use %f\\ instead of %f so that isfname setting is used to match filenames
+" See: https://vi.stackexchange.com/a/8085/29769
 
 " Ignore this error message, it is always redundant
 " ERROR: <filename>:<line>:<col>: C++ compilation of rule '<target>' failed (Exit 1)
@@ -49,7 +52,7 @@ CompilerSet errorformat+=%f:%l:%c:\ note:\ %m                  " <filename>:<lin
 CompilerSet errorformat+=%f:%l:%c:\ \ \ requ%tred\ from\ here  " <filename>:<line>:<col>: <message>
 CompilerSet errorformat+=%f(%l):\ %tarning:\ %m                " <filename>(<line>): warning: <message>
 CompilerSet errorformat+=%f:%l:%c:\ %m                         " <filename>:<line>:<col>: <message>
-CompilerSet errorformat+=%f:%l:\ %m                            " <filename>:<line>: <message>
+CompilerSet errorformat+=%f\\:%l:\ %m                          " <filename>:<line>: <message>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
