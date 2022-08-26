@@ -8,34 +8,6 @@ function! bazel#ModifyPath(bazel_root)
   let &path = &path . "," . resolve(a:bazel_root . "/bazel-" . project_dir)
 endfunction
 
-" Compiler errors will often refer to files relative to bazel-bin
-" or bazel-<project>. This function looks for all such files in the
-" quickfix list and updates their path so that they can be jumped to
-" though the quickfix list
-function! bazel#ResolveQuickfixPaths()
-  let tmp = getqflist({"items": [], "title": ""})
-  let qflist = tmp["items"]
-  let title = tmp["title"]
-
-  for loc in qflist
-    let name = bufname(loc.bufnr)
-    if filereadable(name)
-      continue
-    endif
-
-    " search for file in path
-    let found = findfile(name)
-    if empty(found)
-      continue
-    endif
-
-    let loc.bufnr = bufnr(found, 1)
-  endfor
-
-  call setqflist([], 'r', {"items": qflist, "title": title})
-endfunction
-
-
 " Jump to build file and search for filename where this command was called
 function! bazel#JumpToBuildFile()
   let current_file = expand("%:t")

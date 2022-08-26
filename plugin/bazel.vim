@@ -22,14 +22,6 @@ endif
 " Add bazel-bin and bazel-<project> to the path
 call bazel#ModifyPath(fnamemodify(s:bazel_workspace_file, ":p:h"))
 
-augroup VimBazel
-  autocmd!
-  " Resolve references to external/ paths in the quickfix list
-  " There's a relative flag which might do it, wait until I encounter
-  " such an issue
-  " autocmd QuickFixCmdPost make :call bazel#ResolveQuickfixPaths()
-augroup END
-
 " Jump to the BUILD file corresponding to current source file
 command! Bld :call bazel#JumpToBuildFile()
 
