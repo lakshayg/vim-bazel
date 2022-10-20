@@ -51,6 +51,7 @@ CompilerSet errorformat+=%f:%l:%c:\ %tarning:\ %m              " <filename>:<lin
 CompilerSet errorformat+=%f:%l:%c:\ note:\ %m                  " <filename>:<line>:<col>: note: <message>
 CompilerSet errorformat+=%f:%l:%c:\ \ \ requ%tred\ from\ here  " <filename>:<line>:<col>: <message>
 CompilerSet errorformat+=%f(%l):\ %tarning:\ %m                " <filename>(<line>): warning: <message>
+CompilerSet errorformat+=%f(%l):\ %trror:\ %m                  " <filename>(<line>): error: <message>
 CompilerSet errorformat+=%f:%l:%c:\ %m                         " <filename>:<line>:<col>: <message>
 CompilerSet errorformat+=%f\\:%l:\ %m                          " <filename>:<line>: <message>
 
