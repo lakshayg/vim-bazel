@@ -42,7 +42,7 @@ function! s:GetTargetsFromContext() abort
   let relative_path = <SID>PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
-  let fmt = "$(bazel cquery --collapse_duplicate_defines --noshow_timestamps --output=starlark 'kind(rule, rdeps(%s, %s, 1))')"
+  let fmt = "$(bazel cquery --collapse_duplicate_defines --noshow_timestamps --output=starlark 'kind(rule, rdeps(%s, %s, 1))' || echo CQUERY_FAILED)"
   return printf(fmt, package_spec, fname)
 endfunction
 
