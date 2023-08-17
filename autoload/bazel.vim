@@ -38,12 +38,13 @@ function! s:GetTargetsFromContext() abort
   endif
 
   " Assume that the current file is a source file
+  let rel_fname = <SID>PathRelativeToWsRoot(fname)
   let build_file_path = findfile("BUILD", ".;")
   let relative_path = <SID>PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
   let fmt = "$(bazel cquery --collapse_duplicate_defines --noshow_timestamps --output=starlark 'kind(rule, rdeps(%s, %s, 1))' || echo CQUERY_FAILED)"
-  return printf(fmt, package_spec, fname)
+  return printf(fmt, package_spec, rel_fname)
 endfunction
 
 function! bazel#Execute(action, ...) abort
