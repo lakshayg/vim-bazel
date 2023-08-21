@@ -28,17 +28,15 @@ function! s:PathRelativeToWsRoot(path) abort
 endfunction
 
 function! s:GetTargetsFromContext() abort
-  let fname = expand("%")
+  let rel_fname = <SID>PathRelativeToWsRoot(fname)
 
   " Is the current file a BUILD file?
   if fnamemodify(fname, ":t") ==# "BUILD"
-    let rel_path = <SID>PathRelativeToWsRoot(fname)
-    let package_path = fnamemodify(rel_path, ":h")
+    let package_path = fnamemodify(rel_fname, ":h")
     return "//" . package_path . ":all"
   endif
 
   " Assume that the current file is a source file
-  let rel_fname = <SID>PathRelativeToWsRoot(fname)
   let build_file_path = findfile("BUILD", ".;")
   let relative_path = <SID>PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
