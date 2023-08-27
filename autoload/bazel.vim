@@ -28,10 +28,10 @@ function! s:PathRelativeToWsRoot(path) abort
 endfunction
 
 function! s:GetTargetsFromContext() abort
-  let rel_fname = <SID>PathRelativeToWsRoot(fname)
+  let rel_fname = <SID>PathRelativeToWsRoot(expand('%'))
 
   " Is the current file a BUILD file?
-  if fnamemodify(fname, ":t") ==# "BUILD"
+  if fnamemodify(rel_fname, ":t") ==# "BUILD"
     let package_path = fnamemodify(rel_fname, ":h")
     return "//" . package_path . ":all"
   endif
