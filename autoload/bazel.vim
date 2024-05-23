@@ -27,7 +27,7 @@ function! s:PathRelativeToWsRoot(path) abort
   return rel_path
 endfunction
 
-function! s:GetTargetsFromContext() abort
+function! s:GetTargetsFromContext(action) abort
   let rel_fname = <SID>PathRelativeToWsRoot(expand('%'))
 
   " Is the current file a BUILD file?
@@ -41,8 +41,17 @@ function! s:GetTargetsFromContext() abort
   let relative_path = <SID>PathRelativeToWsRoot(build_file_path)
   let package_path = fnamemodify(relative_path, ":h")
   let package_spec = "//" . package_path . "/..."
-  let fmt = "$(bazel cquery --collapse_duplicate_defines --noshow_timestamps --output=starlark 'kind(rule, rdeps(%s, %s, 1))' || echo CQUERY_FAILED)"
-  return printf(fmt, package_spec, rel_fname)
+
+  let query = printf("let targets = rdeps(%s, %s, 1) in ", package_spec, rel_fname)
+  if a:action ==# "test"
+    let query .= "tests($targets)"
+  elseif a:action ==# "run"
+    let query .= "tests($targets) union kind(.*binary.*, $targets)"
+  else
+    let query .= "kind(rule, $targets)"
+  endif
+
+  return printf("$(bazel cquery --collapse_duplicate_defines --noshow_timestamps --output=starlark '%s' || echo CQUERY_FAILED)", query)
 endfunction
 
 function! bazel#Execute(action, ...) abort
@@ -67,7 +76,7 @@ function! bazel#Execute(action, ...) abort
   let rest = a:000[i:]
 
   if empty(targets)
-    let targets = [<SID>GetTargetsFromContext()]
+    let targets = [<SID>GetTargetsFromContext(a:action)]
   endif
 
   compiler bazel
